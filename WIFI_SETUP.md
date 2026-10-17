@@ -72,3 +72,9 @@ Se o IP mudar, reinicie o servidor para incluir o endereço novo no certificado 
 No notebook, **Procurar atualização** baixa e confere os arquivos oficiais. Só **Autorizar atualização nos aparelhos** troca a versão ativa. Cada aparelho aguarda concluir sua edição e esvaziar a fila antes de recarregar. Um aparelho offline recebe a versão autorizada ao reconectar. A versão anterior é preservada; se a nova não confirmar inicialização em 90 segundos, o servidor retorna à anterior. Também existe a página independente `https://localhost:8765/maintenance` para voltar manualmente.
 
 Atualizações do servidor Python que alterem o protocolo exigem novo pacote e reinício autorizado no Windows. A atualização da interface não instala programas no Android nem contorna permissões do sistema. A instalação inicial e os testes reais no seu notebook/celular ainda precisam ser realizados pelo professor; testes automatizados não substituem essa validação.
+
+## Pacote para outro professor testar
+
+O pacote de teste pode ser gerado com `python tools/build_test_package.py ProvaScan_Instalacao_Teste_Windows.zip`. A montagem usa uma lista fixa de arquivos e verifica o manifesto da interface; não inclui banco, certificados, chaves, ambientes Python, logs ou testes. O ZIP contém `COMECE-AQUI.txt` e `Instalar-ProvaScan.bat`, que realiza a instalação inicial e configura o início automático em uma única sequência. Requer Python 3.12+ com Launcher e internet para instalar dependências. Se Python faltar, o instalador abre o site oficial e orienta a repetir após a instalação.
+
+Cada professor usa seu próprio usuário/notebook, banco e certificado local. Em uma conta Windows que já tenha ProvaScan, os dados existentes são reutilizados. Para iniciar o piloto, use somente dados fictícios e siga o roteiro de teste incluído. O instalador é experimental e não é um executável assinado; a validação real deve ser feita no Windows de destino.
