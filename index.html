@@ -4,7 +4,7 @@
 .utility-actions{position:static;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center;max-width:1100px;margin:4px auto 22px;padding:8px 24px 24px;clear:both}
 .utility-actions button,.utility-actions label{display:inline-flex;align-items:center;justify-content:center;min-height:44px;white-space:normal;margin:0;font-size:14px}
 @media(max-width:720px){.utility-actions{justify-content:stretch;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 26px;padding:10px 12px 32px}.utility-actions button,.utility-actions label{width:100%;text-align:center}.utility-actions label:last-child{grid-column:1/-1} .tablewrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}main{min-width:0}.card{min-width:0}}
-</style></head><body><header><div><h1>▣ ProvaScan</h1><small>Protótipo pessoal · v0.6.2</small></div><span id="status" class="pill">Dados neste dispositivo</span></header><div class="shell"><nav id="nav"></nav><main id="main"></main></div><script>
+</style></head><body><header><div><h1>▣ ProvaScan</h1><small>Protótipo pessoal · v0.6.3</small></div><span id="status" class="pill">Dados neste dispositivo</span></header><div class="shell"><nav id="nav"></nav><main id="main"></main></div><script>
 async function readXlsxNames(file){
  const data=await file.arrayBuffer(),v=new DataView(data),u=new Uint8Array(data);let eocd=-1;
  for(let i=u.length-22;i>=Math.max(0,u.length-65557);i--){if(v.getUint32(i,true)===0x06054b50){eocd=i;break}}
@@ -101,7 +101,7 @@ function bind(){document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>
 <section id="mobileScanner" style="display:none">
 <div style="display:flex;align-items:center;justify-content:space-between"><strong>ProvaScan v0.6 · Captura</strong><button id="closeMobileScan">Fechar</button></div>
 <p>Enquadre o cartão inteiro, com os 16 quadrados pretos visíveis. Mantenha o foco e evite sombras.</p>
-<div class="camera-guide-wrap" style="position:relative;overflow:hidden;background:#111;border-radius:12px"><video id="mobileVideo" class="scan-cam" autoplay muted playsinline></video><div aria-hidden="true" style="position:absolute;inset:15% 7%;border:3px solid #ff3939;border-radius:8px;pointer-events:none;box-shadow:0 0 0 999px #0002"><span style="position:absolute;bottom:5px;left:6px;color:#fff;background:#b31e1ecc;font-size:12px;padding:3px">Alinhe os 16 quadrados pretos dentro da moldura</span></div></div>
+<div id="cameraGuide" class="camera-guide-wrap" style="position:relative;overflow:hidden;background:#111;border-radius:12px"><video id="mobileVideo" class="scan-cam" autoplay muted playsinline></video><div aria-hidden="true" style="position:absolute;inset:15% 7%;border:3px solid #ff3939;border-radius:8px;pointer-events:none;box-shadow:0 0 0 999px #0002"><span style="position:absolute;bottom:5px;left:6px;color:#fff;background:#b31e1ecc;font-size:12px;padding:3px"><span id="cameraGuideText">Alinhe os 16 quadrados pretos dentro da moldura</span></span></div></div>
 <canvas id="mobileCapture" style="display:none"></canvas>
 <div class="scan-tools"><button id="takeMobilePhoto">📷 Capturar e abrir conferência</button></div>
 <p style="font-size:12px">A leitura óptica é experimental. Todas as alternativas devem ser conferidas antes de salvar uma nota.</p>
@@ -118,17 +118,25 @@ function bind(){document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>
 </section>
 <script>
 (function(){
- let stream=null,angle=0,photo=null,reviewAnswers=[],reviewConfidence=[],reviewExam=null,reviewStudent='',zoom=1,photoLocation=null,pressStart=null;
+ let guideLoop=0,guideLast=0,stream=null,angle=0,photo=null,reviewAnswers=[],reviewConfidence=[],reviewExam=null,reviewStudent='',zoom=1,photoLocation=null,pressStart=null;
  const el=id=>document.getElementById(id);
- async function stop(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+ async function stop(){cancelAnimationFrame(guideLoop);guideLoop=0;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
  function closeCamera(){stop();el('mobileScanner').style.display='none'}
  window.openMobileScanner=async function(){
    let e=ex(),student=el('studentToGrade');
    if(!e||!student||!student.value)return alert('Abra Correção e selecione uma avaliação e um aluno antes de fotografar.');
    if(Object.keys(e.key).length!==e.n)return alert('Preencha todo o gabarito oficial antes de iniciar.');
    reviewExam=e.id;reviewStudent=student.value;el('reviewScreen').style.display='none';el('mobileScanner').style.display='block';
-   try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});el('mobileVideo').srcObject=stream;await el('mobileVideo').play()}catch(err){alert('Câmera indisponível: '+err.message);closeCamera()}
+   try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});el('mobileVideo').srcObject=stream;await el('mobileVideo').play();guideLast=0;guideLoop=requestAnimationFrame(checkGuide)}catch(err){alert('Câmera indisponível: '+err.message);closeCamera()}
  };
+ function checkGuide(now){if(!stream)return;guideLoop=requestAnimationFrame(checkGuide);if(now-guideLast<850)return;guideLast=now;
+ let v=el('mobileVideo'),guide=el('cameraGuide'),txt=el('cameraGuideText');if(!v.videoWidth)return;
+ let e=db.exams.find(x=>x.id===reviewExam);if(!e)return;
+ let t=document.createElement('canvas'),ratio=Math.min(1,850/v.videoWidth,850/v.videoHeight);t.width=Math.round(v.videoWidth*ratio);t.height=Math.round(v.videoHeight*ratio);t.getContext('2d').drawImage(v,0,0,t.width,t.height);
+ let ok=!!locate(t,e);let frame=guide.querySelector('div[aria-hidden]');if(frame){frame.style.borderColor=ok?'#19d873':'#ff3939';frame.style.boxShadow=ok?'0 0 0 999px #0002, 0 0 15px #19d873':'0 0 0 999px #0002'}
+ txt.textContent=ok?'✓ Marcadores identificados — pode capturar':'Alinhe os 16 quadrados pretos dentro da moldura';
+ txt.parentElement.style.background=ok?'#137d4edb':'#b31e1ecc'
+ }
  el('closeMobileScan').onclick=closeCamera;
  el('takeMobilePhoto').onclick=async()=>{
   let v=el('mobileVideo');if(!v.videoWidth)return alert('Aguarde a câmera focar.');
@@ -140,11 +148,50 @@ function bind(){document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>
  el('rerunReview').onclick=()=>renderReview(true);
  function rotated(){let c=document.createElement('canvas');if(angle%180){c.width=photo.height;c.height=photo.width}else{c.width=photo.width;c.height=photo.height}let x=c.getContext('2d');x.translate(c.width/2,c.height/2);x.rotate(angle*Math.PI/180);x.drawImage(photo,-photo.width/2,-photo.height/2);return c}
  // Detecta regiões pretas compactas, buscando duas faixas de oito marcadores.
- function markers(canvas){let w=canvas.width,h=canvas.height,k=Math.min(1,1000/w,1000/h),tw=Math.round(w*k),th=Math.round(h*k),t=document.createElement('canvas');t.width=tw;t.height=th;t.getContext('2d').drawImage(canvas,0,0,tw,th);let d=t.getContext('2d').getImageData(0,0,tw,th).data,mask=new Uint8Array(tw*th),visited=new Uint8Array(tw*th);for(let i=0;i<mask.length;i++){let z=i*4;mask[i]=(d[z]*.299+d[z+1]*.587+d[z+2]*.114)<85?1:0}let blobs=[],queue=new Int32Array(tw*th);for(let y=0;y<th;y+=2)for(let x=0;x<tw;x+=2){let st=y*tw+x;if(!mask[st]||visited[st])continue;let head=0,tail=1;queue[0]=st;visited[st]=1;let minx=x,maxx=x,miny=y,maxy=y,count=0;while(head<tail){let at=queue[head++],xx=at%tw,yy=(at/tw)|0;count++;minx=Math.min(minx,xx);maxx=Math.max(maxx,xx);miny=Math.min(miny,yy);maxy=Math.max(maxy,yy);for(let n of [at-1,at+1,at-tw,at+tw]){if(n<0||n>=mask.length||visited[n]||!mask[n])continue;let nx=n%tw;if(Math.abs(nx-xx)>1)continue;visited[n]=1;queue[tail++]=n}}let bw=maxx-minx+1,bh=maxy-miny+1;if(count>35&&bw>=6&&bh>=6&&bw/bh>.62&&bw/bh<1.55&&count/(bw*bh)>.56&&bw<tw*.09&&bh<th*.13)blobs.push({x:(minx+maxx)/2/k,y:(miny+maxy)/2/k,size:(bw+bh)/2/k})}return blobs}
- function locate(c,e){let blobs=markers(c),rows=Math.ceil(e.n/2),svgH=136+rows*36,svgW=880;
- // A imagem precisa conter o cartão na horizontal; agrupamento por faixas superior e inferior.
- let best=null;for(let b of blobs){let top=blobs.filter(p=>Math.abs(p.y-b.y)<Math.max(12,b.size*.9)&&Math.abs(p.size-b.size)<b.size*.65).sort((a,z)=>a.x-z.x);if(top.length<7)continue;let bottom=blobs.filter(p=>p.y>b.y+3*b.size&&Math.abs(p.size-b.size)<b.size*.65).sort((a,z)=>a.y-z.y);for(let q of bottom){let row=bottom.filter(p=>Math.abs(p.y-q.y)<Math.max(12,q.size*.9)).sort((a,z)=>a.x-z.x);if(row.length<7)continue;let t=top.slice(0,8),r=row.slice(0,8),span=t[7].x-t[0].x;if(span<=0)continue;let spacing=span/7,regular=t.slice(1).every((p,i)=>Math.abs(p.x-t[i].x-spacing)<spacing*.4);if(!regular)continue;let score=Math.abs(t[0].x-r[0].x)+Math.abs(t[7].x-r[7].x)+Math.abs((r[0].y-t[0].y)-(svgH-47)/svgW*span);if(!best||score<best.score)best={score,top:t,bottom:r}}}return best}
- function mapPoint(loc,x,y){let top=loc.top,bottom=loc.bottom,fx=(x-33.5)/(7*118),fy=(y-23.5)/(loc.svgH-47);let a=top[0],b=top[7],c=bottom[0],d=bottom[7];return{x:(1-fy)*(a.x+(b.x-a.x)*fx)+fy*(c.x+(d.x-c.x)*fx),y:(1-fy)*(a.y+(b.y-a.y)*fx)+fy*(c.y+(d.y-c.y)*fx)}}
+ function markers(canvas){
+ let w=canvas.width,h=canvas.height,k=Math.min(1,1100/w,1100/h),tw=Math.max(1,Math.round(w*k)),th=Math.max(1,Math.round(h*k));
+ let t=document.createElement('canvas');t.width=tw;t.height=th;let tx=t.getContext('2d',{willReadFrequently:true});tx.drawImage(canvas,0,0,tw,th);
+ let d=tx.getImageData(0,0,tw,th).data,gray=new Uint8Array(tw*th),hist=new Uint32Array(256);
+ for(let i=0;i<gray.length;i++){let z=i*4,v=Math.round(d[z]*.299+d[z+1]*.587+d[z+2]*.114);gray[i]=v;hist[v]++}
+ let total=gray.length,target=total*.035,acc=0,threshold=90;for(let i=0;i<180;i++){acc+=hist[i];if(acc>=target){threshold=Math.max(55,Math.min(145,i+12));break}}
+ let mask=new Uint8Array(total),visited=new Uint8Array(total);for(let i=0;i<total;i++)mask[i]=gray[i]<threshold?1:0;
+ let blobs=[],queue=new Int32Array(total);
+ for(let y=0;y<th;y++)for(let x=0;x<tw;x++){let st=y*tw+x;if(!mask[st]||visited[st])continue;
+ let head=0,tail=1;queue[0]=st;visited[st]=1;let minx=x,maxx=x,miny=y,maxy=y,count=0;
+ while(head<tail){let at=queue[head++],xx=at%tw,yy=(at/tw)|0;count++;if(xx<minx)minx=xx;if(xx>maxx)maxx=xx;if(yy<miny)miny=yy;if(yy>maxy)maxy=yy;
+ let neighbors=[xx>0?at-1:-1,xx<tw-1?at+1:-1,yy>0?at-tw:-1,yy<th-1?at+tw:-1];
+ for(let n of neighbors){if(n<0||visited[n]||!mask[n])continue;visited[n]=1;queue[tail++]=n}
+ }
+ let bw=maxx-minx+1,bh=maxy-miny+1,area=bw*bh;
+ if(count>=9&&bw>=3&&bh>=3&&bw/bh>.55&&bw/bh<1.8&&count/area>.45&&bw<tw*.075&&bh<th*.12)
+ blobs.push({x:(minx+maxx)/2/k,y:(miny+maxy)/2/k,size:(bw+bh)/2/k})
+ }return blobs
+ }
+ function locate(c,e){
+ let blobs=markers(c),rows=Math.ceil(e.n/2),svgH=136+rows*36,best=null;
+ // Procura duas fileiras com 8 quadrados equidistantes, tolerando perspectiva moderada.
+ for(let seed of blobs){
+ let tolerance=Math.max(7,seed.size*.85);
+ let candidates=blobs.filter(p=>Math.abs(p.y-seed.y)<tolerance&&Math.abs(p.size-seed.size)<seed.size*.7).sort((a,b)=>a.x-b.x);
+ if(candidates.length<8)continue;
+ for(let start=0;start<=candidates.length-8;start++){
+ let top=candidates.slice(start,start+8),span=top[7].x-top[0].x,spacing=span/7;
+ if(spacing<seed.size*1.5||!top.every((p,i)=>Math.abs(p.x-(top[0].x+spacing*i))<spacing*.3))continue;
+ for(let other of blobs){
+ let sep=other.y-seed.y;if(sep<seed.size*3)continue;
+ let bottom=blobs.filter(p=>Math.abs(p.y-other.y)<Math.max(7,other.size*.85)&&Math.abs(p.size-seed.size)<seed.size*.7).sort((a,b)=>a.x-b.x);
+ if(bottom.length<8)continue;
+ for(let j=0;j<=bottom.length-8;j++){
+ let row=bottom.slice(j,j+8),rspan=row[7].x-row[0].x;
+ if(Math.abs(rspan-span)>span*.22||!row.every((p,i)=>Math.abs(p.x-(row[0].x+rspan*i/7))<spacing*.35))continue;
+ let score=Math.abs(top[0].x-row[0].x)+Math.abs(top[7].x-row[7].x)+Math.abs(sep/span-(svgH-47)/826)*span;
+ if(!best||score<best.score)best={score,top,bottom:row,svgH}
+ }
+ }
+ }
+ }return best
+ }
+  function mapPoint(loc,x,y){let top=loc.top,bottom=loc.bottom,fx=(x-33.5)/(7*118),fy=(y-23.5)/(loc.svgH-47);let a=top[0],b=top[7],c=bottom[0],d=bottom[7];return{x:(1-fy)*(a.x+(b.x-a.x)*fx)+fy*(c.x+(d.x-c.x)*fx),y:(1-fy)*(a.y+(b.y-a.y)*fx)+fy*(c.y+(d.y-c.y)*fx)}}
  function autoRead(c,e){let loc=locate(c,e);if(!loc)return{answers:Array(e.n).fill('?'),confidence:Array(e.n).fill('duvida'),message:'Não foi possível identificar com segurança os 16 marcadores. Use Girar 90°, centralize os quadrados na foto ou tire outra fotografia. Nenhuma nota será registrada sem sua conferência.'};loc.svgH=136+Math.ceil(e.n/2)*36;
  let ctx=c.getContext('2d'),im=ctx.getImageData(0,0,c.width,c.height),d=im.data,rows=Math.ceil(e.n/2),ans=[],conf=[];
  function darkness(cx,cy,r){let sum=0,num=0;for(let yy=-r;yy<=r;yy+=2)for(let xx=-r;xx<=r;xx+=2){if(xx*xx+yy*yy>r*r)continue;let X=Math.round(cx+xx),Y=Math.round(cy+yy);if(X<0||Y<0||X>=c.width||Y>=c.height)continue;let p=(Y*c.width+X)*4;sum+=1-(d[p]*.299+d[p+1]*.587+d[p+2]*.114)/255;num++}return num?sum/num:0}
