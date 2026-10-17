@@ -1,4 +1,4 @@
-ProvaScan Mobile v0.6.15 — Protótipo experimental
+ProvaScan Mobile v0.7.0 — Protótipo experimental
 
 INSTALAÇÃO: publicar os arquivos da aplicação em servidor HTTPS; abrir no Chrome Android; menu > Instalar aplicativo. Não é necessário instalar Node.js para usar o aplicativo.
 
@@ -15,3 +15,5 @@ Os testes controlados não medem a taxa de acerto em câmeras reais. As capturas
 A v0.6.14 destaca em vermelho questões em branco e com múltiplas marcações. Dúvidas permanecem em amarelo e bloqueiam a validação. Caixas A–E permitem registrar mais de uma alternativa; há também o modo de toque Marcar/desmarcar bolhas. O modo Substituir mantém a correção por toque de uma resposta por vez. O resumo identifica as questões que receberão zero. A leitura óptica e os controles de enquadramento/pinça permanecem os da v0.6.13.
 
 A v0.6.15 apresenta notas em cartões para celular, separa erros de resposta única e duplicidades e oferece Ver correção por questão. O CSV acompanha essa separação. Novas correções guardam o gabarito e o valor da avaliação usados no cálculo; registros antigos conservam a nota e usam o gabarito atual apenas para exibir detalhes, com aviso. O formulário de respostas do aluno fica recolhido em Correção manual — sem câmera; Gabarito oficial é reservado às respostas corretas. Scanner, geometria e pinça não foram modificados.
+
+A v0.7.0 prepara a conexão e sincronização pelo Google Drive. Leia DRIVE_SETUP.md para configurar o ID público do cliente OAuth Web. Sem essa credencial a conexão real não é ativada; o app preserva o modo local e apresenta a configuração inicial. A pasta ProvaScan/Dados guarda revisões de turmas, alunos, avaliações e correções. Alterações concorrentes são preservadas para conferência. Tokens temporários ficam somente em memória e respostas da API Drive não são armazenadas no cache do service worker. A validação real em duas contas/sessões depende da configuração e autorização do proprietário; os testes automatizados usam uma API simulada.

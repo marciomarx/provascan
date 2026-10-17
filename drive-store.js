@@ -1,0 +1,33 @@
+/* ProvaScan: immutable record revisions, shared by the browser and regression tests. */
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.ProvaScanDriveStore=api})(typeof globalThis!=='undefined'?globalThis:this,function(){
+'use strict';
+const clone=x=>JSON.parse(JSON.stringify(x));
+function stable(x){if(Array.isArray(x))return '['+x.map(stable).join(',')+']';if(x&&typeof x==='object')return '{'+Object.keys(x).sort().map(k=>JSON.stringify(k)+':'+stable(x[k])).join(',')+'}';return JSON.stringify(x)}
+function flatten(db){const records={};for(const c of db.classes||[]){const {students,...meta}=c;records['class/'+c.id]=clone(meta);for(const s of students||[])records['student/'+c.id+'/'+s.id]=clone(s)}for(const e of db.exams||[]){const {results,...meta}=e;records['exam/'+e.id]=clone(meta);for(const [sid,r] of Object.entries(results||{}))records['result/'+e.id+'/'+sid]=clone(r)}return records}
+function validate(event){if(!event||typeof event.id!=='string'||!event.id||event.id.length>200||typeof event.key!=='string'||! /^(class|exam)\/[^/]+$|^(student|result)\/[^/]+\/[^/]+$/.test(event.key)||!Array.isArray(event.parents)||event.parents.some(p=>typeof p!=='string')||typeof event.at!=='string'||!Object.hasOwn(event,'value')||event.value!==null&&(typeof event.value!=='object'||Array.isArray(event.value)))throw Error('Arquivo de sincronização inválido. Os dados locais foram preservados.');if(event.value!==null){const parts=event.key.split('/');if(['class','student','exam'].includes(parts[0])&&event.value.id!==parts.at(-1))throw Error('Identificação de registro inválida.');if(parts[0]==='class'&&typeof event.value.name!=='string')throw Error('Turma inválida.');if(parts[0]==='exam'&&(!Number.isInteger(event.value.n)||event.value.n<1||event.value.n>30||![4,5].includes(event.value.alt)||typeof event.value.classId!=='string'))throw Error('Avaliação inválida.')}}
+function index(events){const byId=new Map(),groups=new Map();for(const event of events){validate(event);const prev=byId.get(event.id);if(prev&&stable(prev)!==stable(event))throw Error('Revisões com o mesmo código e conteúdo diferente.');byId.set(event.id,event)}for(const event of byId.values()){if(!groups.has(event.key))groups.set(event.key,new Map());groups.get(event.key).set(event.id,event)}for(const event of byId.values())for(const parent of event.parents){const p=byId.get(parent);if(!p||p.key!==event.key)throw Error('Histórico incompleto no Drive. Não apague os arquivos da pasta Dados.');groups.get(event.key).delete(parent)}
+ // Reject cycles, including corrupt revisions that would otherwise disappear from all heads.
+ const visiting=new Set(),done=new Set();function walk(id){if(done.has(id))return;if(visiting.has(id))throw Error('Histórico de sincronização inválido.');visiting.add(id);for(const p of byId.get(id).parents)walk(p);visiting.delete(id);done.add(id)}for(const id of byId.keys())walk(id);
+ return{byId,groups}}
+function inspect(events){const {byId,groups}=index(events),records={},conflicts=[];for(const [key,g] of groups){const heads=[...g.values()].sort((a,b)=>a.at.localeCompare(b.at)||a.id.localeCompare(b.id)),different=new Set(heads.map(e=>stable(e.value)));if(different.size>1)conflicts.push({key,heads});records[key]=heads.at(-1).value}
+ const orphans=new Set();for(const [key,v] of Object.entries(records)){if(v===null)continue;const p=key.split('/');if(p[0]==='student'&&records['class/'+p[1]]==null)orphans.add('class/'+p[1]);if(p[0]==='exam'&&records['class/'+v.classId]==null)orphans.add('class/'+v.classId);if(p[0]==='result'&&records['exam/'+p[1]]==null)orphans.add('exam/'+p[1])}
+ const classes=Object.entries(records).filter(([k,v])=>k.startsWith('class/')&&v!==null).map(([,v])=>({...clone(v),students:[]})),exams=Object.entries(records).filter(([k,v])=>k.startsWith('exam/')&&v!==null).map(([,v])=>({...clone(v),results:{}}));
+ for(const [key,v] of Object.entries(records)){if(v===null)continue;const p=key.split('/');if(p[0]==='student')classes.find(c=>c.id===p[1])?.students.push(clone(v));if(p[0]==='result'){const e=exams.find(e=>e.id===p[1]);if(e)e.results[p[2]]=clone(v)}}
+ classes.sort((a,b)=>a.id.localeCompare(b.id));exams.sort((a,b)=>a.id.localeCompare(b.id));for(const c of classes)c.students.sort((a,b)=>a.id.localeCompare(b.id));
+ return{records,conflicts,orphans:[...orphans].sort(),db:{classes,exams},byId,groups}}
+class Store{
+ constructor({events=[],pending=[],acked=null,baseline={classes:[],exams:[]},id=()=>crypto.randomUUID(),now=()=>new Date().toISOString()}={}){this.events=clone(events);this.pending=new Set(pending);this.acked=new Set(acked||events.filter(e=>!pending.includes(e.id)).map(e=>e.id));this.baseline=flatten(baseline);this.id=id;this.now=now;inspect(this.events)}
+ revision(key,value){const current=inspect(this.events),parents=[...(current.groups.get(key)?.keys()||[])];const event={id:this.id(),key,parents,value:clone(value),at:this.now()};validate(event);this.events.push(event);this.pending.add(event.id);return event}
+ capture(db){const next=flatten(db),keys=new Set([...Object.keys(this.baseline),...Object.keys(next)]);for(const key of keys)if(stable(next[key]??null)!==stable(this.baseline[key]??null))this.revision(key,next[key]??null);this.baseline=clone(next)}
+ ingest(incoming){const map=new Map(this.events.map(e=>[e.id,e]));for(const e of incoming){validate(e);if(map.has(e.id)&&stable(map.get(e.id))!==stable(e))throw Error('Revisão conflitante inválida.');map.set(e.id,clone(e))}const events=[...map.values()];inspect(events);this.events=events}
+ view(){return inspect(this.events)}
+ accept(db){this.baseline=flatten(db)}
+ resolve(key,id){const event=this.events.find(e=>e.key===key&&e.id===id);if(!event)throw Error('Versão não encontrada.');return this.revision(key,event.value)}
+ restore(key){const candidates=this.events.filter(e=>e.key===key&&e.value!==null).sort((a,b)=>a.at.localeCompare(b.at)||a.id.localeCompare(b.id));if(!candidates.length)throw Error('Não foi possível recuperar o vínculo automaticamente. Preserve o backup e entre em contato.');return this.revision(key,candidates.at(-1).value)}
+ outbox(){return this.events.filter(e=>this.pending.has(e.id))}
+ ack(ids){ids.forEach(id=>{this.pending.delete(id);this.acked.add(id)})}
+ mergeState(state){this.ingest(state.events||[]);for(const id of state.acked||[])this.acked.add(id);for(const id of state.pending||[])this.pending.add(id);for(const id of this.acked)this.pending.delete(id)}
+ serialize(){return{events:this.events,pending:[...this.pending],acked:[...this.acked]}}
+}
+return{Store,flatten,inspect,stable};
+});
