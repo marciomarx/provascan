@@ -78,3 +78,13 @@ Atualizações do servidor Python que alterem o protocolo exigem novo pacote e r
 O pacote de teste pode ser gerado com `python tools/build_test_package.py ProvaScan_Instalacao_Teste_Windows.zip`. A montagem usa uma lista fixa de arquivos e verifica o manifesto da interface; não inclui banco, certificados, chaves, ambientes Python, logs ou testes. O ZIP contém `COMECE-AQUI.txt` e `Instalar-ProvaScan.bat`, que realiza a instalação inicial e configura o início automático em uma única sequência. Requer Python 3.12+ com Launcher e internet para instalar dependências. Se Python faltar, o instalador abre o site oficial e orienta a repetir após a instalação.
 
 Cada professor usa seu próprio usuário/notebook, banco e certificado local. Em uma conta Windows que já tenha ProvaScan, os dados existentes são reutilizados. Para iniciar o piloto, use somente dados fictícios e siga o roteiro de teste incluído. O instalador é experimental e não é um executável assinado; a validação real deve ser feita no Windows de destino.
+
+## Abertura e trabalho offline no celular
+
+Depois do primeiro pareamento, abra o app instalado no mesmo endereço e aguarde a indicação **Cópia do aplicativo pronta para uso offline**. A interface é carregada do cache instalado antes de tentar o notebook. Assim, dados móveis ativos ou um endereço local sem resposta não devem prender a abertura aguardando a rede. O primeiro carregamento em um aparelho novo continua exigindo acesso ao notebook para preparar a cópia e receber o banco.
+
+Com uma cópia inicial recebida, cadastros e correções são gravados na fila persistente do aparelho e podem ser recuperados ao reabrir. Sem conexão, a interface mostra **Offline** ou **Pendente de sincronização**. Isso não é confirmação do notebook. Na mesma rede, com o notebook acessível e o app aberto, o envio é retomado; conflitos continuam exigindo conferência.
+
+Não desinstale o app, não limpe o armazenamento do navegador e não troque o endereço/IP com operações pendentes. O armazenamento offline continua sujeito às regras do navegador e do sistema; exporte backups. O modo offline não permite receber alterações remotas sem reencontrar o notebook e não muda a autoridade dos dados.
+
+Após autorizar esta atualização no notebook, mantenha o celular conectado à mesma rede, reabra e confira a preparação offline. Teste sair do app, desligar o Wi-Fi, reabrir com dados móveis, cadastrar um dado fictício e salvar uma correção; feche/reabra ainda offline e confira ambos. Depois religue o Wi-Fi e verifique a confirmação no notebook. Essa validação real no Android continua necessária.
