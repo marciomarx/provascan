@@ -230,6 +230,7 @@ if __name__ == '__main__':
     parser.add_argument('--ip', action='append', default=[])
     parser.add_argument('--port', type=int, default=8765)
     parser.add_argument('--cert-only', action='store_true')
+    parser.add_argument('--no-browser', action='store_true', help='Iniciar em segundo plano sem abrir o navegador')
     args = parser.parse_args()
     ips = sorted(set(args.ip or addresses()))
     folder = Path(args.data)
@@ -244,9 +245,13 @@ if __name__ == '__main__':
     for ip in ips:
         print('CELULAR (mesmo Wi-Fi): https://'+ip+':'+str(args.port))
     print('Código do CELULAR (válido por 10 minutos):', server.pair_code)
-    print('Não feche esta janela enquanto estiver usando o ProvaScan. Ctrl+C encerra.\n')
+    if args.no_browser:
+        print('ProvaScan em segundo plano. Use o ícone da área de trabalho para abrir o aplicativo.\n')
+    else:
+        print('Não feche esta janela enquanto estiver usando o ProvaScan. Ctrl+C encerra.\n')
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.minimum_version = ssl.TLSVersion.TLSv1_2
     context.load_cert_chain(folder/'certificates'/'server.pem', folder/'certificates'/'server-key.pem')
-    webbrowser.open('https://localhost:'+str(args.port))
+    if not args.no_browser:
+        webbrowser.open('https://localhost:'+str(args.port))
     web.run_app(server.application(), host='0.0.0.0', port=args.port, ssl_context=context, access_log=None)
