@@ -9,6 +9,7 @@ function setup(){
  vm.runInContext(html.slice(html.indexOf('function esc('),html.indexOf('function id(')),s);
  vm.runInContext(html.slice(html.indexOf('function option('),html.indexOf('function ensure(')),s);
  vm.runInContext(html.slice(html.indexOf('function examEditor('),html.indexOf('function makeSvg(')),s);
+ vm.runInContext(html.slice(html.indexOf('function resultContext('),html.indexOf('function pointsText(')),s);
  vm.runInContext(html.slice(html.indexOf('function pointsText('),html.indexOf('function download(')),s);
  return{s,nodes,setAnnulled:value=>selected=value,setConfirmation:value=>confirmed=value,get saved(){return saved}};
 }
