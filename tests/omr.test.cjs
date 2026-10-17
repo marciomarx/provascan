@@ -59,7 +59,7 @@ test('unrecognized photograph returns only pending answers',()=>{
 function validation(answers,{valid=true}={}){
  const exam={id:'exam',n:20,points:10,key:Object.fromEntries(single.map((a,i)=>[i,a])),results:{}};
  const elements={validateReview:{},reviewScreen:{style:{}}};let saves=0,confirms=0;const confirmationMessages=[];
- const context={el:id=>elements[id],db:{exams:[exam]},reviewExam:'exam',reviewStudent:'student',photo:{},photoValid:valid,photoLocation:valid?{}:null,reviewAnswers:answers,
+ const context={el:id=>elements[id],db:{exams:[exam]},reviewExam:'exam',reviewStudent:'student',photo:{},photoValid:valid,photoLocation:valid?{}:null,reviewAnswers:answers,reviewSelections:answers.map(a=>/^[A-E]$/.test(a)?[a]:[]),
   alert:()=>{},confirm:message=>{confirms++;confirmationMessages.push(message);return true},save:()=>saves++,go:()=>{}};
  vm.createContext(context);
  vm.runInContext(html.slice(html.indexOf(" el('validateReview').onclick="),html.indexOf(' let panel=document.createElement')),context);
@@ -67,7 +67,7 @@ function validation(answers,{valid=true}={}){
 }
 test('MULTI earns zero even if one of the two marks matches the key',()=>{
  const answers=[...single];answers[0]='MULTI';const r=validation(answers);
- assert.equal(r.saves,1);assert.equal(r.result.correct,19);assert.equal(r.result.wrong,1);assert.equal(r.result.score,9.5);assert.equal(r.result.answers[0],'MULTI');assert.match(r.confirmationMessages[0],/ZERO: Q1 \(múltiplas marcações\)/);
+ assert.equal(r.saves,1);assert.equal(r.result.correct,19);assert.equal(r.result.wrong,1);assert.equal(r.result.score,9.5);assert.equal(r.result.answers[0],'MULTI');assert.equal(r.result.keySnapshot[1],single[1]);assert.equal(r.result.pointsSnapshot,10);assert.match(r.confirmationMessages[0],/ZERO: Q1 \(múltiplas marcações\)/);
 });
 test('pending answers and invalid geometry cannot be saved',()=>{
  const answers=[...single];answers[0]='?';assert.equal(validation(answers).saves,0);
