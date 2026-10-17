@@ -12,6 +12,7 @@ test('default transport calls browser fetch with its global receiver',async()=>{
  assert.equal(await vm.runInContext("new ProvaScanDriveApi.DriveApi({token:'test-token'}).account().then(user=>user.permissionId)",context),'browser-account');
  assert.equal(context.observed.authorization,'Bearer test-token');
  assert.match(context.observed.url,/drive\/v3\/about/);
+ assert.equal(await vm.runInContext("new ProvaScanDriveApi.DriveApi({token:'test-token',fetcher:fetch}).account().then(user=>user.permissionId)",context),'browser-account');
 });
 const response=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json'}});
 test('authorization is carried in a header, never in the URL',async()=>{let request;const api=new DriveApi({token:'private-test-token',fetcher:async(url,opts)=>{request={url,opts};return response({user:{permissionId:'account-a',emailAddress:'a@example.test'}})}});assert.equal((await api.account()).permissionId,'account-a');assert.equal(request.opts.headers.Authorization,'Bearer private-test-token');assert(!request.url.includes('private-test-token'))});

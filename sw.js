@@ -1,4 +1,4 @@
-const CACHE='provascan-v071';
+const CACHE='provascan-v072';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./drive-config.js','./drive-store.js','./drive-api.js','./drive-sync.js','./privacy.html','./drive-setup.html','./DRIVE_SETUP.md'];
 const urls=new Set(ASSETS.map(path=>new URL(path,self.location.href).href));
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
