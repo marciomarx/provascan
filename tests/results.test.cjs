@@ -9,6 +9,7 @@ function setup(){
  const s={db:{classes:[{id:'c',name:'Turma',students}],exams:[exam]},chosenStudent:'',ex:()=>exam,chosenExam:'e'};vm.createContext(s);
  vm.runInContext(html.slice(html.indexOf('function esc('),html.indexOf('function id(')),s);
  vm.runInContext(html.slice(html.indexOf('function option('),html.indexOf('function ensure(')),s);
+ vm.runInContext(html.slice(html.indexOf('function availableExams('),html.indexOf('function exams(')),s);
  vm.runInContext(html.slice(html.indexOf('function picker('),html.indexOf('function makeSvg(')),s);
  vm.runInContext(html.slice(html.indexOf('function correction('),html.indexOf('function download(')),s);
  return {s,exam,saved,students};
