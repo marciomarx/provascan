@@ -1,4 +1,4 @@
-ProvaScan Mobile v0.6.13 — Protótipo experimental
+ProvaScan Mobile v0.6.14 — Protótipo experimental
 
 INSTALAÇÃO: publicar os arquivos da aplicação em servidor HTTPS; abrir no Chrome Android; menu > Instalar aplicativo. Não é necessário instalar Node.js para usar o aplicativo.
 
@@ -11,3 +11,5 @@ Os cadastros permanecem locais em cada navegador. Exportar backup JSON permite a
 VALIDAÇÃO: npm install; npm test (Node.js 20 ou superior). Os testes renderizam cartões de 19, 20 e 30 questões, com 4/5 alternativas, escalas e iluminação distintas; verificam respostas simples, duplas/triplas, segunda marca mais clara, campos em branco, leitura incerta e pontuação. Para uma captura local adicional, execute PROVASCAN_CAPTURE_DIR=/caminho/das/capturas npm test. Nenhuma fotografia de aluno é distribuída com o projeto.
 
 Os testes controlados não medem a taxa de acerto em câmeras reais. As capturas disponíveis são telas já processadas, com círculos coloridos sobrepostos e redimensionamento; não substituem as fotografias originais. A validação em Android com fotografias originais ainda é necessária. Confira todas as respostas antes de registrar notas.
+
+A v0.6.14 destaca em vermelho questões em branco e com múltiplas marcações. Dúvidas permanecem em amarelo e bloqueiam a validação. Caixas A–E permitem registrar mais de uma alternativa; há também o modo de toque Marcar/desmarcar bolhas. O modo Substituir mantém a correção por toque de uma resposta por vez. O resumo identifica as questões que receberão zero. A leitura óptica e os controles de enquadramento/pinça permanecem os da v0.6.13.

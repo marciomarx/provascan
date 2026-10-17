@@ -42,7 +42,7 @@ for(const scale of [.65,1,2])test(`independent double/triple marks and blanks, s
  const r=read(await card(answers,{scale,paper:190,shadow:55,weak:110,offset:1.5}));
  const expected=[...single];for(const i of [0,1,5,19])expected[i]='MULTI';expected[10]='';
  assert.deepEqual(Array.from(r.answers),expected);
- assert.equal(r.confidence[0],'multipla');assert.equal(r.confidence[10],'branco');
+ assert.equal(r.confidence[0],'multipla');assert.equal(r.confidence[10],'branco');assert.deepEqual(Array.from(r.selections[0]),['A','E']);
 });
 test('all empty outlines stay blank under a lighting gradient',async()=>{
  const r=read(await card(Array(20).fill(''),{paper:180,shadow:60}));
@@ -58,16 +58,16 @@ test('unrecognized photograph returns only pending answers',()=>{
 });
 function validation(answers,{valid=true}={}){
  const exam={id:'exam',n:20,points:10,key:Object.fromEntries(single.map((a,i)=>[i,a])),results:{}};
- const elements={validateReview:{},reviewScreen:{style:{}}};let saves=0,confirms=0;
+ const elements={validateReview:{},reviewScreen:{style:{}}};let saves=0,confirms=0;const confirmationMessages=[];
  const context={el:id=>elements[id],db:{exams:[exam]},reviewExam:'exam',reviewStudent:'student',photo:{},photoValid:valid,photoLocation:valid?{}:null,reviewAnswers:answers,
-  alert:()=>{},confirm:()=>{confirms++;return true},save:()=>saves++,go:()=>{}};
+  alert:()=>{},confirm:message=>{confirms++;confirmationMessages.push(message);return true},save:()=>saves++,go:()=>{}};
  vm.createContext(context);
  vm.runInContext(html.slice(html.indexOf(" el('validateReview').onclick="),html.indexOf(' let panel=document.createElement')),context);
- elements.validateReview.onclick();return {result:exam.results.student,saves,confirms};
+ elements.validateReview.onclick();return {result:exam.results.student,saves,confirms,confirmationMessages};
 }
 test('MULTI earns zero even if one of the two marks matches the key',()=>{
  const answers=[...single];answers[0]='MULTI';const r=validation(answers);
- assert.equal(r.saves,1);assert.equal(r.result.correct,19);assert.equal(r.result.wrong,1);assert.equal(r.result.score,9.5);assert.equal(r.result.answers[0],'MULTI');
+ assert.equal(r.saves,1);assert.equal(r.result.correct,19);assert.equal(r.result.wrong,1);assert.equal(r.result.score,9.5);assert.equal(r.result.answers[0],'MULTI');assert.match(r.confirmationMessages[0],/ZERO: Q1 \(múltiplas marcações\)/);
 });
 test('pending answers and invalid geometry cannot be saved',()=>{
  const answers=[...single];answers[0]='?';assert.equal(validation(answers).saves,0);
