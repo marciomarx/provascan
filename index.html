@@ -1,10 +1,10 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145a85"><title>ProvaScan — Protótipo móvel v0.5.1</title><style>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145a85"><title>ProvaScan — Protótipo móvel v0.6.13</title><style>
 :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#17344a;background:#f2f6fa}*{box-sizing:border-box}body{margin:0}header{background:#145a85;color:white;padding:16px 22px;display:flex;justify-content:space-between;align-items:center}header h1{margin:0;font-size:24px}header small{opacity:.85}.shell{display:flex;min-height:calc(100vh - 70px)}nav{width:230px;background:white;border-right:1px solid #dce6ef;padding:14px;flex-shrink:0}nav button{display:block;width:100%;margin:5px 0;text-align:left;background:transparent;color:#23465e;border:0;padding:12px;border-radius:10px;font-weight:650}nav button.active{background:#dceef8;color:#075b8b}main{width:100%;max-width:1100px;padding:24px;margin:auto}.card{background:white;border:1px solid #dce6ef;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 3px 12px #163f5810}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}.metric{font-size:30px;font-weight:750;color:#145a85}h2{margin:0 0 16px}h3{margin:0 0 12px}label{display:block;font-weight:650;font-size:14px;margin:12px 0 5px}input,select{padding:11px;border:1px solid #b6c8d5;border-radius:9px;background:white;width:100%;font:inherit}button{cursor:pointer;font:inherit}.btn{border:0;background:#145a85;color:white;border-radius:10px;padding:11px 15px;margin:10px 8px 2px 0;font-weight:650}.btn.secondary{background:#e3eef5;color:#155273}.btn.danger{background:#a42b36}.hint{color:#657b8b;font-size:13px;line-height:1.5}.row{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.row>*{flex:1;min-width:140px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:480px}td,th{border-bottom:1px solid #e5edf3;padding:11px;text-align:left}th{background:#f3f7fa}.hidden{display:none!important}.answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:8px}.answer{display:flex;align-items:center;gap:7px;border:1px solid #e0e9f0;border-radius:9px;padding:9px}.answer strong{width:28px}.answer label{margin:0;font-size:13px;font-weight:500}.answer input{width:auto}.preview{overflow:auto;background:#eaf0f4;border-radius:10px;padding:15px;text-align:center}.preview svg{max-width:100%;height:auto;background:white;box-shadow:0 3px 10px #0002}.pill{display:inline-block;background:#dff0fa;padding:5px 9px;border-radius:99px;font-size:12px}.notice{padding:12px;background:#fff4d9;border:1px solid #f4d58e;border-radius:10px;color:#6e5114}@media(max-width:720px){.shell{display:block}nav{width:100%;display:flex;overflow:auto;gap:4px;padding:8px;border-right:0;border-bottom:1px solid #dce6ef}nav button{white-space:nowrap;width:auto;min-width:max-content;font-size:13px}main{padding:14px}header h1{font-size:20px}.card{padding:15px}}
 </style><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><style>@media(max-width:700px){.shell{display:block}nav{width:100%;display:flex;overflow-x:auto;white-space:nowrap;border-bottom:1px solid #ddd;padding:6px}nav button{width:auto;flex-shrink:0;font-size:13px;padding:10px}main{width:100%;padding:12px}header{padding:12px}header h1{font-size:20px}} .scan-cam{width:100%;max-height:62vh;background:#111;object-fit:contain;border-radius:8px}.scan-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.scan-tools button{padding:12px;background:#145a85;color:white;border:0;border-radius:9px}.scan-note{background:#fff5df;padding:10px;border-radius:8px;margin:12px 0}</style><style>
 .utility-actions{position:static;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center;max-width:1100px;margin:4px auto 22px;padding:8px 24px 24px;clear:both}
 .utility-actions button,.utility-actions label{display:inline-flex;align-items:center;justify-content:center;min-height:44px;white-space:normal;margin:0;font-size:14px}
 @media(max-width:720px){.utility-actions{justify-content:stretch;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 26px;padding:10px 12px 32px}.utility-actions button,.utility-actions label{width:100%;text-align:center}.utility-actions label:last-child{grid-column:1/-1} .tablewrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}main{min-width:0}.card{min-width:0}}
-</style></head><body><header><div><h1>▣ ProvaScan</h1><small>Protótipo pessoal · v0.6.12</small></div><span id="status" class="pill">Dados neste dispositivo</span></header><div class="shell"><nav id="nav"></nav><main id="main"></main></div><script>
+</style></head><body><header><div><h1>▣ ProvaScan</h1><small>Protótipo pessoal · v0.6.13</small></div><span id="status" class="pill">Dados neste dispositivo</span></header><div class="shell"><nav id="nav"></nav><main id="main"></main></div><script>
 async function readXlsxNames(file){
  const data=await file.arrayBuffer(),v=new DataView(data),u=new Uint8Array(data);let eocd=-1;
  for(let i=u.length-22;i>=Math.max(0,u.length-65557);i--){if(v.getUint32(i,true)===0x06054b50){eocd=i;break}}
@@ -193,15 +193,30 @@ function bind(){document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>
  }
   function mapPoint(loc,x,y){let top=loc.top,bottom=loc.bottom,fx=(x-33.5)/(7*118),fy=(y-23.5)/(loc.svgH-47);let a=top[0],b=top[7],c=bottom[0],d=bottom[7];return{x:(1-fy)*(a.x+(b.x-a.x)*fx)+fy*(c.x+(d.x-c.x)*fx),y:(1-fy)*(a.y+(b.y-a.y)*fx)+fy*(c.y+(d.y-c.y)*fx)}}
  function autoRead(c,e){let loc=locate(c,e);if(!loc)return{answers:Array(e.n).fill('?'),confidence:Array(e.n).fill('duvida'),message:'Não foi possível identificar com segurança os 16 marcadores. Use Girar 90°, centralize os quadrados na foto ou tire outra fotografia. Nenhuma nota será registrada sem sua conferência.'};loc.svgH=136+Math.ceil(e.n/2)*36;
- let ctx=c.getContext('2d'),im=ctx.getImageData(0,0,c.width,c.height),d=im.data,rows=Math.ceil(e.n/2),ans=[],conf=[];
- function darkness(cx,cy,r){let sum=0,num=0;for(let yy=-r;yy<=r;yy+=2)for(let xx=-r;xx<=r;xx+=2){if(xx*xx+yy*yy>r*r)continue;let X=Math.round(cx+xx),Y=Math.round(cy+yy);if(X<0||Y<0||X>=c.width||Y>=c.height)continue;let p=(Y*c.width+X)*4;sum+=1-(d[p]*.299+d[p+1]*.587+d[p+2]*.114)/255;num++}return num?sum/num:0}
- for(let i=0;i<e.n;i++){let col=i<rows?0:1,row=i<rows?i:i-rows,x=[35,465][col],y=94+row*36,scores=[];for(let j=0;j<e.alt;j++){let p=mapPoint(loc,x+94+j*51,y),p2=mapPoint(loc,x+101+j*51,y),radius=Math.max(2,Math.min(12,Math.hypot(p2.x-p.x,p2.y-p.y)*.65));scores.push(Math.max(0,darkness(p.x,p.y,radius)-darkness(p.x+radius*2.2,p.y,radius*.7)))}let sorted=[...scores].sort((a,b)=>b-a),best=scores.indexOf(sorted[0]),gap=sorted[0]-sorted[1];
-// Scores represent local ink contrast, not absolute page darkness.
-// An empty outlined bubble has a light center; a filled bubble has a dark center.
-if(sorted[0]<.12){ans.push('?');conf.push('duvida')}
-else if(sorted[1]>=.12&&sorted[1]>=sorted[0]*.68){ans.push('MULTI');conf.push('multipla')}
-else if(sorted[0]>=.17&&gap>=.07){ans.push('ABCDE'[best]);conf.push('lida')}
-else{ans.push('?');conf.push('duvida')}}return{answers:ans,confidence:conf,message:'Leitura experimental concluída. Confira todas as respostas na fotografia antes de validar.'}}
+ let d=c.getContext('2d').getImageData(0,0,c.width,c.height).data,rows=Math.ceil(e.n/2),ans=[],conf=[];
+ // Amostra no espaço do cartão, mantendo o mapeamento e os controles existentes.
+ // O fundo fica fora do contorno (raio 12); não use o próprio contorno como papel.
+ function grayAt(x,y){let p=mapPoint(loc,x,y),X=Math.round(p.x),Y=Math.round(p.y);if(X<0||Y<0||X>=c.width||Y>=c.height)return null;let k=(Y*c.width+X)*4;return d[k]*.299+d[k+1]*.587+d[k+2]*.114}
+ function bubble(cx,cy){let paper=[];
+ for(let r of [16,18])for(let a=0;a<Math.PI*2;a+=Math.PI/12){let v=grayAt(cx+Math.cos(a)*r,cy+Math.sin(a)*r);if(v!==null)paper.push(v)}
+ if(paper.length<36)return 'uncertain';paper.sort((a,b)=>a-b);let bg=paper[Math.floor(paper.length*.6)];if(bg<45)return 'uncertain';
+ let sum=0,dark=0,count=0;
+ // Integra o interior para aceitar preenchimentos fora do centro sem tocar a borda.
+ for(let yy=-8;yy<=8;yy+=1.25)for(let xx=-8;xx<=8;xx+=1.25){if(xx*xx+yy*yy>64)continue;let v=grayAt(cx+xx,cy+yy);if(v===null)continue;let ink=Math.max(0,(bg-v)/bg);sum+=ink;if(ink>=.25)dark++;count++}
+ if(count<80)return 'uncertain';let mean=sum/count,coverage=dark/count;
+ if(mean>=.24&&coverage>=.45)return 'marked';
+ if(mean<.16&&coverage<.32)return 'empty';
+ return 'uncertain'
+ }
+ for(let i=0;i<e.n;i++){let col=i<rows?0:1,row=i<rows?i:i-rows,x=[35,465][col],y=94+row*36,states=[];
+ for(let j=0;j<e.alt;j++)states.push(bubble(x+94+j*51,y));
+ let marked=states.map((state,j)=>state==='marked'?j:-1).filter(j=>j>=0);
+ // Cada bolha é avaliada independentemente: a segunda pode ser mais clara que a primeira.
+ if(marked.length>=2){ans.push('MULTI');conf.push('multipla')}
+ else if(states.includes('uncertain')){ans.push('?');conf.push('duvida')}
+ else if(marked.length===1){ans.push('ABCDE'[marked[0]]);conf.push('lida')}
+ else{ans.push('');conf.push('branco')}
+ }return{answers:ans,confidence:conf,message:'Leitura experimental concluída. Confira todas as respostas na fotografia antes de validar.'}}
  function updateZoom(){let v=el('reviewImage');v.style.width=(zoom*100)+'%';v.style.maxWidth='none';el('zoomLabel').textContent=Math.round(zoom*100)+'%'}
  const frame=el('reviewFrame'),canvasTouch=el('reviewImage');const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
  canvasTouch.addEventListener('touchstart',ev=>{if(ev.touches.length===2){ev.preventDefault();pinch={d:dist(ev.touches),z:zoom};drag=null;pressStart=null}else if(ev.touches.length===1){drag={x:ev.touches[0].clientX,y:ev.touches[0].clientY,left:frame.scrollLeft,top:frame.scrollTop}}},{passive:false});

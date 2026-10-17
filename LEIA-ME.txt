@@ -1,7 +1,13 @@
-ProvaScan Mobile v0.4 — Protótipo experimental
+ProvaScan Mobile v0.6.13 — Protótipo experimental
 
-INSTALAÇÃO: publicar a pasta inteira em servidor HTTPS; abrir o endereço no Chrome Android; menu > Instalar aplicativo. Sem hospedagem HTTPS, não há link de instalação.
+INSTALAÇÃO: publicar os arquivos da aplicação em servidor HTTPS; abrir no Chrome Android; menu > Instalar aplicativo. Não é necessário instalar Node.js para usar o aplicativo.
 
-A câmera permite enquadrar e capturar uma imagem, mas NÃO faz leitura óptica automática nem validação de marcações verdes. Não usar para notas oficiais.
+A câmera enquadra o cartão por 16 marcadores e sugere respostas para conferência. Cada bolha é comparada ao papel em sua vizinhança; duas ou mais bolhas preenchidas são classificadas como múltiplas marcações, mesmo com intensidades diferentes. Leituras intermediárias ficam como Dúvida e bloqueiam a validação. Múltiplas marcações e questões em branco recebem zero após a conferência.
 
-Cadastros são locais em cada navegador; backup JSON permite transferência manual entre dispositivos.
+A v0.6.13 mantém os marcadores, a geometria, o enquadramento, a rotação, a pinça, o arraste e a correção por toque da v0.6.12. Altera a medição do preenchimento e atualiza o cache para a nova versão.
+
+Os cadastros permanecem locais em cada navegador. Exportar backup JSON permite a transferência manual entre dispositivos.
+
+VALIDAÇÃO: npm install; npm test (Node.js 20 ou superior). Os testes renderizam cartões de 19, 20 e 30 questões, com 4/5 alternativas, escalas e iluminação distintas; verificam respostas simples, duplas/triplas, segunda marca mais clara, campos em branco, leitura incerta e pontuação. Para uma captura local adicional, execute PROVASCAN_CAPTURE_DIR=/caminho/das/capturas npm test. Nenhuma fotografia de aluno é distribuída com o projeto.
+
+Os testes controlados não medem a taxa de acerto em câmeras reais. As capturas disponíveis são telas já processadas, com círculos coloridos sobrepostos e redimensionamento; não substituem as fotografias originais. A validação em Android com fotografias originais ainda é necessária. Confira todas as respostas antes de registrar notas.
