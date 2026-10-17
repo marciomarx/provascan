@@ -1,0 +1,7 @@
+ProvaScan Mobile v0.4 — Protótipo experimental
+
+INSTALAÇÃO: publicar a pasta inteira em servidor HTTPS; abrir o endereço no Chrome Android; menu > Instalar aplicativo. Sem hospedagem HTTPS, não há link de instalação.
+
+A câmera permite enquadrar e capturar uma imagem, mas NÃO faz leitura óptica automática nem validação de marcações verdes. Não usar para notas oficiais.
+
+Cadastros são locais em cada navegador; backup JSON permite transferência manual entre dispositivos.
