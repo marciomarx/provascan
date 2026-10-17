@@ -16,6 +16,24 @@ No app atual, sincronize os aparelhos e use **Exportar backup** no notebook e no
 6. Se o Windows pedir permissão de firewall, permita o Python **somente em redes privadas**. Use sua rede doméstica como privada. Não abra portas no roteador nem habilite acesso público.
 7. Mantenha a janela aberta. Ela mostra o endereço do notebook, o endereço do celular e os códigos distintos de pareamento. Digite o código exclusivo do notebook em `https://localhost:8765`.
 
+## Início automático no Windows (opcional, após a instalação inicial)
+
+Para não depender da janela preta, execute **Instalar-ProvaScan-Automatico.bat** uma vez na pasta permanente do projeto. Isso cria, somente para o usuário atual e sem administrador:
+
+- **ProvaScan** na área de trabalho: garante que o servidor está acessível e abre `https://localhost:8765`. Clicar novamente reutiliza o servidor, sem iniciar outra cópia.
+- **Conexão ProvaScan** na área de trabalho: abre o registro local com endereços e códigos da inicialização. Os códigos expiram como antes; este arquivo é local e contém informações de pareamento, não deve ser publicado.
+- Um atalho na pasta Inicializar do Windows: inicia o servidor em segundo plano ao entrar na conta, sem abrir o navegador ou uma janela preta. O Windows precisa permitir aplicativos de inicialização e a rede pode levar alguns segundos para conectar.
+
+**Para atualizar uma instalação existente:** aguarde Sincronizado e exporte um backup; encerre o servidor antigo; baixe o ZIP atualizado e extraia em uma pasta permanente. Execute o instalador automático acima. Ele reutiliza o ambiente Python existente naquela pasta ou prepara um novo, se necessário (com internet para baixar as dependências). Se usar a pasta antiga, preserve `.venv-lan`. O banco, certificados e sessões permanecem em `%LOCALAPPDATA%\ProvaScan`, fora da pasta do código. Esta atualização do iniciador não é instalada pelo botão de atualização da interface.
+
+Não mova ou apague a pasta do programa após criar os atalhos. Se mover, execute o instalador automático na nova pasta. Ele substitui os atalhos existentes. A área de trabalho é resolvida pelo Windows, inclusive quando redirecionada ao OneDrive.
+
+O servidor só inicia após entrar no Windows, não enquanto o computador estiver desligado, suspenso ou antes do login. Fechar a página não encerra o servidor em segundo plano. Para parar de iniciar junto com o Windows, execute **Desativar-Inicio-Automatico.bat**; isso preserva os dados e os atalhos, e o servidor atual termina quando sair da conta ou desligar o computador. O ícone ProvaScan continua permitindo iniciar por demanda.
+
+Em caso de falha, clique no ícone ProvaScan: ele apresenta o erro. Os registros ficam em `%LOCALAPPDATA%\ProvaScan\servidor.log` e, se houver erro no login, `inicializacao-erro.txt`. Se a porta estiver ocupada por algo que não se identifica como este servidor HTTPS, o iniciador não inicia outra cópia nem ignora o certificado. O modo anterior `Iniciar-ProvaScan-WiFi.bat` permanece disponível para diagnóstico, sem executar os dois modos ao mesmo tempo.
+
+As regras de firewall, certificado do Android e mudança de IP permanecem iguais. Início automático não libera redes públicas nem altera permissões do Windows. Sincronize antes de mudar de rede/endereço.
+
 ## 3. Preparar o Android
 
 A câmera precisa de uma conexão HTTPS confiável. Não basta ignorar uma advertência de certificado.
