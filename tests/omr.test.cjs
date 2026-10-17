@@ -57,9 +57,9 @@ test('unrecognized photograph returns only pending answers',()=>{
  const r=read({canvas:c,exam:e});assert.deepEqual(Array.from(r.answers),Array(20).fill('?'));
 });
 function validation(answers,{valid=true,annulled=[]}={}){
- const exam={id:'exam',n:20,alt:5,annulled,points:10,key:Object.fromEntries(single.map((a,i)=>[i,a])),results:{}};
+ const exam={id:'exam',name:'Prova',classId:'class',n:20,alt:5,annulled,points:10,key:Object.fromEntries(single.map((a,i)=>[i,a])),results:{}};
  const elements={validateReview:{},reviewScreen:{style:{}}};let saves=0,confirms=0;const confirmationMessages=[];
- const context={ProvaScanGrading:require('../grading.js'),el:id=>elements[id],db:{exams:[exam]},reviewExam:'exam',reviewStudent:'student',photo:{},photoValid:valid,photoLocation:valid?{}:null,reviewAnswers:answers,reviewSelections:answers.map(a=>/^[A-E]$/.test(a)?[a]:[]),
+ const context={ProvaScanGrading:require('../grading.js'),el:id=>elements[id],db:{classes:[{id:'class',name:'Turma',students:[{id:'student',name:'Aluno'}]}],exams:[exam]},reviewExam:'exam',reviewStudent:'student',photo:{},photoValid:valid,photoLocation:valid?{}:null,reviewAnswers:answers,reviewSelections:answers.map(a=>/^[A-E]$/.test(a)?[a]:[]),
   alert:()=>{},confirm:message=>{confirms++;confirmationMessages.push(message);return true},save:()=>saves++,go:()=>{}};
  vm.createContext(context);
  vm.runInContext(html.slice(html.indexOf(" el('validateReview').onclick="),html.indexOf(' let panel=document.createElement')),context);

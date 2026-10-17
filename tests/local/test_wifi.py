@@ -50,6 +50,25 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(self.db.snapshot()['db']['exams'][0]['results']['s']['score'],100)
         exam['annulled']=[];exam['key']['1']='D';self.db.apply(operation(self.db,{'exam/e':exam},'operation-0005'))
         result=self.db.snapshot()['db']['exams'][0]['results']['s'];self.assertEqual(result['score'],100);self.assertEqual(len(result['gradingHistory']),3)
+    def test_delete_one_result_preserves_other_exams_and_survives_replay(self):
+        self.db.apply(self.result())
+        second=copy.deepcopy(self.db.snapshot()['db']['exams'][0])
+        second['id']='second'
+        values=flatten({'classes':[], 'exams':[second]})
+        self.db.apply(operation(self.db,values,'operation-0003',{'exam/second':None}))
+        old_result=self.db.snapshot()['db']['exams'][1]['results']['s']
+        version=self.db.snapshot()['versions']['exam/e']
+        removal=operation(self.db,{'result/e/s':None},'operation-0004',{'exam/e':version})
+        self.db.apply(removal)
+        self.db.apply(removal)
+        state=self.db.snapshot()
+        self.assertNotIn('s',state['db']['exams'][0]['results'])
+        self.assertEqual(state['db']['exams'][1]['results']['s'],old_result)
+        stale=self.result('operation-0005')
+        stale['changes'][0]['base']='operation-0002'
+        self.assertEqual(self.db.apply(stale)['type'],'conflict')
+        self.db.apply(self.result('operation-0006'))
+        self.assertEqual(self.db.snapshot()['db']['exams'][0]['results']['s']['score'],5)
     def test_stale_result_dependency_conflicts_even_when_result_does_not_exist(self):
         stale=self.result();exam=flatten(seed())['exam/e'];exam['points']=100
         self.db.apply(operation(self.db,{'exam/e':exam},'operation-0003'))
