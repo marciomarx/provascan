@@ -56,10 +56,10 @@ test('unrecognized photograph returns only pending answers',()=>{
  const c=createCanvas(880,496);c.getContext('2d').fillRect(0,0,880,496);
  const r=read({canvas:c,exam:e});assert.deepEqual(Array.from(r.answers),Array(20).fill('?'));
 });
-function validation(answers,{valid=true}={}){
- const exam={id:'exam',n:20,points:10,key:Object.fromEntries(single.map((a,i)=>[i,a])),results:{}};
+function validation(answers,{valid=true,annulled=[]}={}){
+ const exam={id:'exam',n:20,alt:5,annulled,points:10,key:Object.fromEntries(single.map((a,i)=>[i,a])),results:{}};
  const elements={validateReview:{},reviewScreen:{style:{}}};let saves=0,confirms=0;const confirmationMessages=[];
- const context={el:id=>elements[id],db:{exams:[exam]},reviewExam:'exam',reviewStudent:'student',photo:{},photoValid:valid,photoLocation:valid?{}:null,reviewAnswers:answers,reviewSelections:answers.map(a=>/^[A-E]$/.test(a)?[a]:[]),
+ const context={ProvaScanGrading:require('../grading.js'),el:id=>elements[id],db:{exams:[exam]},reviewExam:'exam',reviewStudent:'student',photo:{},photoValid:valid,photoLocation:valid?{}:null,reviewAnswers:answers,reviewSelections:answers.map(a=>/^[A-E]$/.test(a)?[a]:[]),
   alert:()=>{},confirm:message=>{confirms++;confirmationMessages.push(message);return true},save:()=>saves++,go:()=>{}};
  vm.createContext(context);
  vm.runInContext(html.slice(html.indexOf(" el('validateReview').onclick="),html.indexOf(' let panel=document.createElement')),context);
@@ -76,6 +76,10 @@ test('pending answers and invalid geometry cannot be saved',()=>{
 test('blank answer earns zero and remains counted separately',()=>{
  const answers=[...single];answers[0]='';const r=validation(answers);
  assert.equal(r.result.blank,1);assert.equal(r.result.correct,19);assert.equal(r.result.score,9.5);
+});
+test('camera validation excludes annulled doubts and uses the remaining valid questions for the grade',()=>{
+ const answers=[...single];answers[0]='?';answers[1]='MULTI';
+ const r=validation(answers,{annulled:[0,1]});assert.equal(r.saves,1);assert.equal(r.result.score,10);assert.equal(r.result.correct,18);assert.equal(r.result.wrong,0);assert.equal(r.result.blank,0);assert.deepEqual(Array.from(r.result.annulledSnapshot),[0,1]);assert.equal(r.result.answers[1],'MULTI');assert.doesNotMatch(r.confirmationMessages[0],/ZERO/);
 });
 // Optionally examine local screenshots without committing student photos to the repository.
 // Colored review overlays and screenshot resizing affect these results; these are supporting evidence only.
