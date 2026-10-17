@@ -1,0 +1,8 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),crypto=require('node:crypto');
+test('the complete app starts without an OAuth client and retains its local workflow',()=>{
+ const elements=new Map(),values=new Map();function node(id){if(!elements.has(id))elements.set(id,{innerHTML:'',textContent:'',style:{},dataset:{},value:'',addEventListener(){},setAttribute(){},querySelector(){return null},querySelectorAll(){return[]},after(){},before(){}});return elements.get(id)}
+ const document={visibilityState:'visible',getElementById:node,querySelector:selector=>selector==='.shell'?node('shell'):null,querySelectorAll:()=>[],createElement:()=>node('created')};
+ const context={document,localStorage:{getItem:k=>values.get(k)||null,setItem:(k,v)=>values.set(k,v)},navigator:{},location:{protocol:'https:'},setTimeout:()=>1,clearTimeout(){},setInterval(){},addEventListener(){},crypto,console};context.window=context;
+ vm.createContext(context);const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');for(const m of html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)){const src=m[1].match(/src="([^"]+)"/);if(src&&!src[1].startsWith('http'))vm.runInContext(fs.readFileSync(path.join(__dirname,'..',src[1]),'utf8'),context);else if(!src)vm.runInContext(m[2],context)}
+ assert.match(node('main').innerHTML,/Painel inicial/);assert.match(node('created').innerHTML,/Conectar ao Google Drive/);assert.deepEqual(JSON.parse(JSON.stringify(context.provascanApp.getData())),{classes:[],exams:[]});assert.equal(typeof context.openMobileScanner,'function');assert.equal(typeof context.provascanDrive.changed,'function');
+});
