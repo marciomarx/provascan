@@ -1,0 +1,86 @@
+PROVASCAN - PACOTE DE TESTE PARA PROFESSORES
+Windows + celular Android | Edicao local por Wi-Fi
+
+1. INSTALAR NO NOTEBOOK
+- Extraia TODO o ZIP numa pasta permanente, por exemplo Documentos\ProvaScan.
+  Nao execute os arquivos dentro do ZIP nem mova a pasta depois da instalacao.
+- De dois cliques em Instalar-ProvaScan.bat e acompanhe as mensagens.
+- E necessario Python 3.12 ou superior com Python Launcher. Se faltar, o
+  instalador abre o site oficial: instale e execute Instalar-ProvaScan.bat novamente.
+- A primeira instalacao precisa de internet para baixar as dependencias.
+- O certificado HTTPS e criado no seu notebook. Autorize somente o certificado
+  ProvaScan que acabou de gerar. As chaves privadas devem ficar neste computador.
+- Se o firewall perguntar, permita o Python somente em redes privadas.
+- Os atalhos ProvaScan e Conexao ProvaScan aparecem na area de trabalho.
+- O servidor inicia em segundo plano ao entrar no Windows. Abra ProvaScan
+  pelo icone; nao e necessario manter uma janela preta aberta.
+
+2. PRIMEIRO ACESSO
+- A pagina do notebook e https://localhost:8765.
+- Se pedir codigo, abra Conexao ProvaScan e use o codigo exclusivo do NOTEBOOK.
+- Cadastre uma turma ficticia, alunos de teste e uma avaliacao. Monte o gabarito.
+- Este pacote NAO inclui os alunos, provas, notas ou certificados do criador.
+- Se ja existir ProvaScan neste usuario do Windows, os dados anteriores serao
+  reutilizados, sem apagar ou substituir o banco. O pacote nao cria outro banco
+  automaticamente. Nao compartilhe o mesmo notebook/usuario para testes isolados.
+
+3. CONECTAR O CELULAR ANDROID
+- Use a mesma rede Wi-Fi de confianca no celular e notebook.
+- No Windows, pressione Windows + R e cole:
+  %LOCALAPPDATA%\ProvaScan\certificates
+- Transfira SOMENTE ProvaScan-CA.crt ao celular. Nunca envie os arquivos
+  ca-key.pem ou server-key.pem.
+- No Android, instale como Certificado de CA nas configuracoes de seguranca.
+  Em Samsung, procure Seguranca e privacidade > Mais configuracoes de seguranca
+  > Instalar do armazenamento do dispositivo > Certificado de CA.
+  Os nomes podem variar; nao e o certificado de rede Wi-Fi empresarial.
+- Abra Conexao ProvaScan no notebook. No Chrome do CELULAR, digite o endereco
+  CELULAR mostrado, por exemplo https://192.168.x.x:8765.
+  Nao use localhost no telefone e nao use o endereco do exemplo literalmente.
+- Digite o codigo do CELULAR, valido por 10 minutos apos o servidor iniciar.
+  Se expirar antes do primeiro pareamento, reinicie o notebook e abra Conexao
+  ProvaScan para consultar os novos codigos. Aparelhos ja pareados reconectam.
+- Se o navegador apresentar erro de certificado, confira a instalacao e o IP;
+  nao ignore o aviso. Depois de conectado, use Instalar e criar atalho no Chrome.
+- Use apenas uma janela/aba de edicao em cada navegador. Se instalar como app,
+  feche a aba original do Chrome antes de abrir o aplicativo instalado.
+
+4. ROTEIRO DE TESTE
+[ ] Criar duas turmas e duas provas diferentes para a mesma turma.
+[ ] Criar um aluno no notebook e conferir no celular sem atualizar a pagina.
+[ ] Criar outro no celular e conferir no notebook.
+[ ] Gerar/imprimir um cartao-resposta e fotografar no celular.
+[ ] Conferir leitura: uma marcacao, branco, duplicidade e duvida.
+[ ] Salvar correcao e conferir o resultado no notebook, na prova correta.
+[ ] Escanear novamente e fechar sem salvar: a nota anterior deve permanecer.
+[ ] Salvar uma nova correcao: substituir somente o aluno naquela prova.
+[ ] Excluir uma correcao: aluno volta a Pendente somente naquela prova.
+[ ] Alterar valor/anular questao e conferir o recalculo nos dois aparelhos.
+[ ] Desligar Wi-Fi do celular com o app carregado, cadastrar um dado ficticio,
+     religar e conferir a sincronizacao automatica.
+[ ] Reiniciar notebook, abrir pelo icone e conferir reconexao do celular.
+
+Para relatar um problema: anote o que fez, o que esperava e o que apareceu;
+mande imagem da tela e versao do Windows/Android/navegador, usando dados ficticios.
+Nao envie chaves privadas, banco de dados ou registros de conexao completos.
+
+5. USO E ENCERRAMENTO
+- Antes de fechar, aguarde Sincronizado nos dois aparelhos.
+- O notebook precisa estar ligado, conectado e sem suspensao para sincronizar.
+- Fechar a pagina nao encerra o servidor em segundo plano.
+- O celular, quando ja carregado e disponivel offline, guarda alteracoes
+  pendentes localmente. Nao limpe os dados nem desinstale antes de sincronizar.
+- Ao mudar de rede o IP pode mudar. O atalho do celular nao muda sozinho.
+  Sincronize/exporte antes de trocar de endereco e consulte Conexao ProvaScan.
+- Redes compartilhadas/universitarias podem bloquear aparelhos entre si.
+  Mantenha o perfil Publico nessas redes. Nao desative o firewall.
+- Para desativar inicio automatico, execute Desativar-Inicio-Automatico.bat.
+  Isso nao apaga os dados; o servidor atual termina ao sair/desligar o Windows.
+- Banco e backups locais: %LOCALAPPDATA%\ProvaScan.
+  Nao apague essa pasta: ela tambem contem a autoridade HTTPS pessoal.
+
+VERSAO EXPERIMENTAL
+Confira TODAS as respostas antes de salvar a nota. Comece com dados ficticios.
+Nao ha servico de nuvem nem cobranca por utilizacao do ProvaScan nesta edicao.
+Internet e necessaria para baixar dependencias e novas versoes; a conexao entre
+aparelhos usa a rede local. Custos de internet/equipamentos sao independentes.
