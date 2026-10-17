@@ -1,4 +1,4 @@
-ProvaScan Mobile v0.6.14 — Protótipo experimental
+ProvaScan Mobile v0.6.15 — Protótipo experimental
 
 INSTALAÇÃO: publicar os arquivos da aplicação em servidor HTTPS; abrir no Chrome Android; menu > Instalar aplicativo. Não é necessário instalar Node.js para usar o aplicativo.
 
@@ -13,3 +13,5 @@ VALIDAÇÃO: npm install; npm test (Node.js 20 ou superior). Os testes renderiza
 Os testes controlados não medem a taxa de acerto em câmeras reais. As capturas disponíveis são telas já processadas, com círculos coloridos sobrepostos e redimensionamento; não substituem as fotografias originais. A validação em Android com fotografias originais ainda é necessária. Confira todas as respostas antes de registrar notas.
 
 A v0.6.14 destaca em vermelho questões em branco e com múltiplas marcações. Dúvidas permanecem em amarelo e bloqueiam a validação. Caixas A–E permitem registrar mais de uma alternativa; há também o modo de toque Marcar/desmarcar bolhas. O modo Substituir mantém a correção por toque de uma resposta por vez. O resumo identifica as questões que receberão zero. A leitura óptica e os controles de enquadramento/pinça permanecem os da v0.6.13.
+
+A v0.6.15 apresenta notas em cartões para celular, separa erros de resposta única e duplicidades e oferece Ver correção por questão. O CSV acompanha essa separação. Novas correções guardam o gabarito e o valor da avaliação usados no cálculo; registros antigos conservam a nota e usam o gabarito atual apenas para exibir detalhes, com aviso. O formulário de respostas do aluno fica recolhido em Correção manual — sem câmera; Gabarito oficial é reservado às respostas corretas. Scanner, geometria e pinça não foram modificados.
